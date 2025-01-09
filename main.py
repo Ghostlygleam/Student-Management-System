@@ -1,4 +1,4 @@
-from src.utils.course_utils import add_course
+from src.utils.course_service import add_course
 from src.modules.student import Student
 from src.utils.profile_service import view_student_profile
 
