@@ -1,8 +1,9 @@
-from src.utils.course_service import add_course, edit_course, delete_course, assign_instructor_to_course
+from src.utils.course_service import add_course, edit_course, delete_course, assign_instructor_to_course, add_course, enroll_student
 from src.modules.student import Student
 from src.utils.profile_service import view_student_profile
 from src.modules.course import Course
 from src.modules.instructor import Instructor
+
 
 # List to store all courses
 course_list = []
@@ -44,3 +45,14 @@ if len(course_list) > 1:
     assign_instructor_to_course(course_list[1], instructor_jane)  # Assign Jane to the second course
 else:
     print("No second course available to assign an instructor.")
+    
+# Enroll students
+enroll_student(course_list[0], student_id=1)  # Should succeed
+enroll_student(course_list[0], student_id=2)  # Should succeed
+enroll_student(course_list[0], student_id=3)  # Should fail (course is full)
+
+# Display course details
+print("\nCourse Details:")
+for course in course_list:
+    print(course)
+    print(f"Enrolled Students: {course.enrolled_students}")
