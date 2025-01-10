@@ -1,7 +1,8 @@
-from src.utils.course_service import add_course
+from src.utils.course_service import add_course, edit_course, delete_course, assign_instructor_to_course
 from src.modules.student import Student
 from src.utils.profile_service import view_student_profile
-from src.utils.course_service import add_course, edit_course, delete_course
+from src.modules.course import Course
+from src.modules.instructor import Instructor
 
 # List to store all courses
 course_list = []
@@ -31,3 +32,15 @@ student.add_course("Science 102")
 # View the student's profile
 view_student_profile(student)
 
+# Create sample instructors
+instructor_john = Instructor(instructor_id=1, name="John Doe")
+instructor_jane = Instructor(instructor_id=2, name="Jane Smith")
+
+# Assign instructors to courses if courses exist
+if len(course_list) > 0:
+    assign_instructor_to_course(course_list[0], instructor_john)  # Assign John to the first course
+
+if len(course_list) > 1:
+    assign_instructor_to_course(course_list[1], instructor_jane)  # Assign Jane to the second course
+else:
+    print("No second course available to assign an instructor.")
