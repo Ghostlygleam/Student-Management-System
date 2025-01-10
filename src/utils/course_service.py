@@ -61,3 +61,15 @@ def assign_instructor_to_course(course, instructor):
 
     course.instructor = instructor
     print(f"Instructor '{instructor.name}' has been assigned to course '{course.name}'.")
+    
+def enroll_student(course, student_id):
+    """
+    Enroll a student in a course if the course is not full.
+    :param course: Instance of the Course class
+    :param student_id: ID of the student to enroll
+    """
+    if course.is_full():
+        print(f"Course '{course.name}' is full. Cannot enroll student ID {student_id}.")
+    else:
+        course.enrolled_students.append(student_id)
+        print(f"Student ID {student_id} has been enrolled in course '{course.name}'.")
