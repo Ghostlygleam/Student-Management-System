@@ -1,4 +1,5 @@
 from src.modules.course import Course
+from src.modules.instructor import Instructor
 
 def add_course(course_list, course_id, name, capacity):
     """
@@ -47,3 +48,16 @@ def delete_course(course_list, course_id):
             print(f"Course with ID {course_id} has been deleted successfully!")
             return
     print(f"Course with ID {course_id} not found.")
+    
+def assign_instructor_to_course(course, instructor):
+    """
+    Assign an instructor to a course.
+    :param course: Instance of the Course class
+    :param instructor: Instance of the Instructor class
+    """
+    if hasattr(course, 'instructor') and course.instructor:
+        print(f"Course '{course.name}' already has an instructor assigned: {course.instructor.name}.")
+        return
+
+    course.instructor = instructor
+    print(f"Instructor '{instructor.name}' has been assigned to course '{course.name}'.")
