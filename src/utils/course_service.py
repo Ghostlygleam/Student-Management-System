@@ -104,3 +104,19 @@ def unenroll_student_in_course(course, student):
     else:
         print(f"Student '{student.name}' is not enrolled in course '{course.name}'.")
         return False
+def view_enrolled_students(course, student_list):
+    """
+    View all students enrolled in a specific course.
+    :param course: Instance of the Course class
+    :param student_list: List of all student instances
+    """
+    if not course.enrolled_students:
+        print(f"No students are enrolled in the course '{course.name}'.")
+        return
+
+    print(f"Students enrolled in the course '{course.name}':")
+    for student_id in course.enrolled_students:
+        # Найти студента по его ID в student_list
+        student = next((s for s in student_list if s.student_id == student_id), None)
+        if student:
+            print(f"Student ID: {student.student_id}, Name: {student.name}, Email: {student.email}")

@@ -2,6 +2,7 @@ from src.utils.course_service import (
     add_course,
     enroll_student_in_course,
     unenroll_student_in_course,
+    view_enrolled_students,
 )
 from src.modules.course import Course
 from src.modules.student import Student
@@ -49,4 +50,8 @@ for course in course_list:
 print("\nUpdated Student Details:")
 for student in students:
     print(f"Student ID: {student.student_id}, Name: {student.name}, Enrolled Courses: {student.enrolled_courses}")
+    
+# Step 9: View all students enrolled in a course
+print("\nViewing Enrolled Students:")
+view_enrolled_students(course_list[0], students)  
 
