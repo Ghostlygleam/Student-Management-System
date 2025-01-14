@@ -1,58 +1,52 @@
-from src.utils.course_service import add_course, edit_course, delete_course, assign_instructor_to_course, add_course, enroll_student
-from src.modules.student import Student
-from src.utils.profile_service import view_student_profile
+from src.utils.course_service import (
+    add_course,
+    enroll_student_in_course,
+    unenroll_student_in_course,
+)
 from src.modules.course import Course
-from src.modules.instructor import Instructor
+from src.modules.student import Student
 
+# Create a list to store courses
+course_list = []  # Объявление списка курсов
 
-# List to store all courses
-course_list = []
+# Step 1: Adding courses
+add_course(course_list, course_id=101, name="Math 101", capacity=2)
 
-# Adding courses
-add_course(course_list, course_id=101, name="Math 101", capacity=30)
-add_course(course_list, course_id=102, name="Science 102", capacity=25)
+# Step 2: Creating students
+student_1 = Student(student_id=1, name="Alice", email="alice@example.com")
+student_2 = Student(student_id=2, name="Bob", email="bob@example.com")
+student_3 = Student(student_id=3, name="Charlie", email="charlie@example.com")
 
-# Editing a course
-edit_course(course_list, course_id=101, new_name="Advanced Math", new_capacity=40)
+# Step 3: Enroll students
+print("\nEnrolling students:")
+enroll_student_in_course(course_list[0], student_1)
+enroll_student_in_course(course_list[0], student_2)
+enroll_student_in_course(course_list[0], student_3)  # Should fail (course is full)
 
-# Deleting a course
-delete_course(course_list, course_id=102)
-
-# Display all remaining courses
-print("\nAvailable Courses:")
-for course in course_list:
-    print(course)
-
-# Create a sample student
-student = Student(student_id=1, name="Alice", email="alice@example.com")
-
-# Add some courses
-student.add_course("Math 101")
-student.add_course("Science 102")
-
-# View the student's profile
-view_student_profile(student)
-
-# Create sample instructors
-instructor_john = Instructor(instructor_id=1, name="John Doe")
-instructor_jane = Instructor(instructor_id=2, name="Jane Smith")
-
-# Assign instructors to courses if courses exist
-if len(course_list) > 0:
-    assign_instructor_to_course(course_list[0], instructor_john)  # Assign John to the first course
-
-if len(course_list) > 1:
-    assign_instructor_to_course(course_list[1], instructor_jane)  # Assign Jane to the second course
-else:
-    print("No second course available to assign an instructor.")
-    
-# Enroll students
-enroll_student(course_list[0], student_id=1)  # Should succeed
-enroll_student(course_list[0], student_id=2)  # Should succeed
-enroll_student(course_list[0], student_id=3)  # Should fail (course is full)
-
-# Display course details
+# Step 4: Display course details
 print("\nCourse Details:")
 for course in course_list:
     print(course)
+
+# Step 5: Display student details
+print("\nStudent Details:")
+students = [student_1, student_2, student_3]
+for student in students:
+    print(f"Student ID: {student.student_id}, Name: {student.name}, Enrolled Courses: {student.enrolled_courses}")
+
+# Step 6: Unenroll students
+print("\nUnenrolling Students:")
+unenroll_student_in_course(course_list[0], student_2)  # Unenroll Bob
+unenroll_student_in_course(course_list[0], student_3)  # Attempt to unenroll Charlie (not enrolled)
+
+# Step 7: Display updated course details
+print("\nUpdated Course Details:")
+for course in course_list:
+    print(course)
     print(f"Enrolled Students: {course.enrolled_students}")
+
+# Step 8: Display updated student details
+print("\nUpdated Student Details:")
+for student in students:
+    print(f"Student ID: {student.student_id}, Name: {student.name}, Enrolled Courses: {student.enrolled_courses}")
+

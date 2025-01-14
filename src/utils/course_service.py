@@ -73,3 +73,34 @@ def enroll_student(course, student_id):
     else:
         course.enrolled_students.append(student_id)
         print(f"Student ID {student_id} has been enrolled in course '{course.name}'.")
+        
+        
+def enroll_student_in_course(course, student):
+    """
+    Enroll a student in a course if the course is not full.
+    :param course: Instance of the Course class
+    :param student: Instance of the Student class
+    """
+    if course.is_full():
+        print(f"Course '{course.name}' is full. Cannot enroll student '{student.name}'.")
+        return False
+    else:
+        course.enrolled_students.append(student.student_id)
+        student.enroll_in_course(course)
+        print(f"Student '{student.name}' has been enrolled in course '{course.name}'.")
+        return True
+    
+def unenroll_student_in_course(course, student):
+    """
+    Unenroll a student from a course.
+    :param course: Instance of the Course class
+    :param student: Instance of the Student class
+    """
+    if student.student_id in course.enrolled_students:
+        course.enrolled_students.remove(student.student_id)  # Удалить ID студента из списка курса
+        student.enrolled_courses.remove(course.name)  # Удалить курс из списка студента
+        print(f"Student '{student.name}' has been unenrolled from course '{course.name}'.")
+        return True
+    else:
+        print(f"Student '{student.name}' is not enrolled in course '{course.name}'.")
+        return False
