@@ -1,8 +1,5 @@
 def view_student_profile(student):
-    """
-    Display the student's profile information and their enrolled courses.
-    :param student: Instance of the Student class
-    """
+    #Display the student's profile information
     print(f"Student ID: {student.student_id}")
     print(f"Name: {student.name}")
     print(f"Email: {student.email}")

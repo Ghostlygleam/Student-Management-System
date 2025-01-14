@@ -7,51 +7,50 @@ from src.utils.course_service import (
 from src.modules.course import Course
 from src.modules.student import Student
 
-# Create a list to store courses
-course_list = []  # Объявление списка курсов
+course_list = []  
 
-# Step 1: Adding courses
+#Adding courses
 add_course(course_list, course_id=101, name="Math 101", capacity=2)
 
-# Step 2: Creating students
+#Creating students
 student_1 = Student(student_id=1, name="Alice", email="alice@example.com")
 student_2 = Student(student_id=2, name="Bob", email="bob@example.com")
 student_3 = Student(student_id=3, name="Charlie", email="charlie@example.com")
 
-# Step 3: Enroll students
+#Enroll students
 print("\nEnrolling students:")
 enroll_student_in_course(course_list[0], student_1)
 enroll_student_in_course(course_list[0], student_2)
 enroll_student_in_course(course_list[0], student_3)  # Should fail (course is full)
 
-# Step 4: Display course details
+#Display course details
 print("\nCourse Details:")
 for course in course_list:
     print(course)
 
-# Step 5: Display student details
+#Display student details
 print("\nStudent Details:")
 students = [student_1, student_2, student_3]
 for student in students:
     print(f"Student ID: {student.student_id}, Name: {student.name}, Enrolled Courses: {student.enrolled_courses}")
 
-# Step 6: Unenroll students
+#Unenroll students
 print("\nUnenrolling Students:")
-unenroll_student_in_course(course_list[0], student_2)  # Unenroll Bob
-unenroll_student_in_course(course_list[0], student_3)  # Attempt to unenroll Charlie (not enrolled)
+unenroll_student_in_course(course_list[0], student_2)  
+unenroll_student_in_course(course_list[0], student_3) 
 
-# Step 7: Display updated course details
+#Display updated course details
 print("\nUpdated Course Details:")
 for course in course_list:
     print(course)
     print(f"Enrolled Students: {course.enrolled_students}")
 
-# Step 8: Display updated student details
+#Display updated student details
 print("\nUpdated Student Details:")
 for student in students:
     print(f"Student ID: {student.student_id}, Name: {student.name}, Enrolled Courses: {student.enrolled_courses}")
     
-# Step 9: View all students enrolled in a course
+#View all students enrolled in a course
 print("\nViewing Enrolled Students:")
 view_enrolled_students(course_list[0], students)  
 
