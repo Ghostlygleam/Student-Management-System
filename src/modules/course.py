@@ -8,14 +8,16 @@ class Course:
         self.capacity = capacity
         self.enrolled_students = []  # List of enrolled student IDs
         self.instructor = None  # Assigned instructor
-
+        
     def is_full(self):
-        """
-        Check if the course is full.
-        :return: True if the course is full, False otherwise
-        """
-        return len(self.enrolled_students) >= self.capacity
+            """
+            Check if the course is full.
+            :return: True if the course is full, False otherwise
+            """
+            return len(self.enrolled_students) >= self.capacity
 
+
+    
     def __str__(self):
         """
         String representation of a course.
