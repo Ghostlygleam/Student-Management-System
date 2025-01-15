@@ -3,6 +3,7 @@ from src.utils.course_service import (
     enroll_student_in_course,
     unenroll_student_in_course,
     view_enrolled_students,
+    assign_grade_to_student,
 )
 from src.modules.course import Course
 from src.modules.student import Student
@@ -53,4 +54,12 @@ for student in students:
 #View all students enrolled in a course
 print("\nViewing Enrolled Students:")
 view_enrolled_students(course_list[0], students)  
+
+print("\nEnrolling students:")
+enroll_student_in_course(course_list[0], student_1)  
+enroll_student_in_course(course_list[0], student_2)  
+
+
+
+
 

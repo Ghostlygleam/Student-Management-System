@@ -9,3 +9,5 @@ def view_student_profile(student):
             print(f" - {course}")
     else:
         print("No courses enrolled.")
+        
+

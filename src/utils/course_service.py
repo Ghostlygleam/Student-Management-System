@@ -2,7 +2,8 @@ from src.modules.course import Course
 from src.modules.instructor import Instructor
 
 def add_course(course_list, course_id, name, capacity):
-    #Add a new course to the course list
+    #Add a new course to the course list.
+
     for course in course_list:
         if course.course_id == course_id:
             print(f"Course with ID {course_id} already exists.")
@@ -55,23 +56,20 @@ def enroll_student_in_course(course, student):
     #Enroll a student in a course if the course is not full
     if course.is_full():
         print(f"Course '{course.name}' is full. Cannot enroll student '{student.name}'.")
-        return False
     else:
-        course.enrolled_students.append(student.student_id)
-        student.enroll_in_course(course)
+        course.enrolled_students.append(student.student_id) 
+        student.enroll_in_course(course) 
         print(f"Student '{student.name}' has been enrolled in course '{course.name}'.")
-        return True
     
 def unenroll_student_in_course(course, student):
     #Unenroll a student from a course
     if student.student_id in course.enrolled_students:
-        course.enrolled_students.remove(student.student_id)  
-        student.enrolled_courses.remove(course.name)  
+        course.enrolled_students.remove(student.student_id) 
+        student.enrolled_courses.remove(course.course_id) 
         print(f"Student '{student.name}' has been unenrolled from course '{course.name}'.")
-        return True
     else:
         print(f"Student '{student.name}' is not enrolled in course '{course.name}'.")
-        return False
+        
 def view_enrolled_students(course, student_list):
     #View all students enrolled in a specific course
     if not course.enrolled_students:
@@ -83,3 +81,10 @@ def view_enrolled_students(course, student_list):
         student = next((s for s in student_list if s.student_id == student_id), None)
         if student:
             print(f"Student ID: {student.student_id}, Name: {student.name}, Email: {student.email}")
+            
+def assign_grade_to_student(student, course_id, grade):
+    #Assign a grade to a student for a specific course
+    if course_id in student.enrolled_courses:
+        student.assign_grade(course_id, grade)
+    else:
+        print(f"Student '{student.name}' is not enrolled in course ID '{course_id}'.")
