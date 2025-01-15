@@ -5,6 +5,7 @@ class Course:
         self.capacity = capacity
         self.enrolled_students = []  
         self.instructor = None 
+        
     def is_full(self):
         #Check if the course is full
         return len(self.enrolled_students) >= self.capacity

@@ -82,9 +82,4 @@ def view_enrolled_students(course, student_list):
         if student:
             print(f"Student ID: {student.student_id}, Name: {student.name}, Email: {student.email}")
             
-def assign_grade_to_student(student, course_id, grade):
-    #Assign a grade to a student for a specific course
-    if course_id in student.enrolled_courses:
-        student.assign_grade(course_id, grade)
-    else:
-        print(f"Student '{student.name}' is not enrolled in course ID '{course_id}'.")
+
