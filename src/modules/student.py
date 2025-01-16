@@ -4,6 +4,7 @@ class Student:
         self.name = name
         self.email = email
         self.enrolled_courses = []  
+        self.grades = {}
 
     def add_course(self, course_name):
         #Add a course to the student's enrolled courses list
@@ -12,6 +13,12 @@ class Student:
     def enroll_in_course(self, course):
         #Enroll the student in a course
         self.enrolled_courses.append(course.course_id)
+    
+    def assign_grade(self, course_id, grade):
+        #Assign grade for students
+        self.grades[course_id] = grade
+        print(f"Grade '{grade}' has been assigned to student '{self.name}' for course ID '{course_id}'.")
+        
         
 
         
