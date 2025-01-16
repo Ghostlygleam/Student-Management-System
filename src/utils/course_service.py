@@ -97,5 +97,11 @@ def display_student_gpa(student):
 def display_transcript(student):
     #Display the academic transcript of a student
     print(student.generate_transcript())
+    
+def generate_course_list(course_list):
+    #Generate a summary of all courses with enrollment data
+    print("\nCourse List with Enrollment Data:")
+    for course in course_list:
+        print(course.get_summary())
             
 

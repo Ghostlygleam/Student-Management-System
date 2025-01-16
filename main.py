@@ -6,6 +6,7 @@ from src.utils.course_service import (
     assign_grade_to_student, 
     display_student_gpa,
     display_transcript,
+    generate_course_list,
 )
 from src.modules.course import Course
 from src.modules.student import Student
@@ -95,6 +96,9 @@ display_student_gpa(student_3)
 print("\nGenerating Transcripts:")
 display_transcript(student_1)
 display_transcript(student_2)
+
+# Generate and display the course list with enrollment data
+generate_course_list(course_list)
 
 
 
