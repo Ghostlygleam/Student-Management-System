@@ -40,6 +40,22 @@ class Student:
 
         return total_points / total_courses
         
+    def generate_transcript(self):
+        #Generate an academic transcript for the student
+        transcript = f"Academic Transcript for {self.name} (Student ID: {self.student_id}):\n"
+        transcript += f"{'Course ID':<10}{'Grade':<10}\n"
+        transcript += "-" * 20 + "\n"
+
+        if not self.grades:
+            transcript += "No grades available.\n"
+        else:
+            for course_id, grade in self.grades.items():
+                transcript += f"{course_id:<10}{grade:<10}\n"
+
+        gpa = self.calculate_gpa()
+        transcript += f"\nGPA: {gpa:.2f}\n"
+
+        return transcript
         
 
         

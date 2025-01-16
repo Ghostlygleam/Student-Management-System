@@ -5,6 +5,7 @@ from src.utils.course_service import (
     view_enrolled_students,
     assign_grade_to_student, 
     display_student_gpa,
+    display_transcript,
 )
 from src.modules.course import Course
 from src.modules.student import Student
@@ -89,6 +90,11 @@ print("\nCalculating GPA:")
 display_student_gpa(student_1)
 display_student_gpa(student_2)
 display_student_gpa(student_3)
+
+# Display academic transcripts
+print("\nGenerating Transcripts:")
+display_transcript(student_1)
+display_transcript(student_2)
 
 
 
