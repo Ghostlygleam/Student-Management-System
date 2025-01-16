@@ -88,5 +88,10 @@ def assign_grade_to_student(student, course_id, grade):
         print(f"Grade '{grade}' has been assigned to student '{student.name}' for course ID '{course_id}'.")
     else:
         print(f"Student '{student.name}' is not enrolled in course ID '{course_id}'.")
+        
+def display_student_gpa(student):
+    #Display the GPA of a student
+    gpa = student.calculate_gpa()
+    print(f"Student '{student.name}' has a GPA of {gpa:.2f}.")
             
 
