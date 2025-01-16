@@ -93,5 +93,9 @@ def display_student_gpa(student):
     #Display the GPA of a student
     gpa = student.calculate_gpa()
     print(f"Student '{student.name}' has a GPA of {gpa:.2f}.")
+    
+def display_transcript(student):
+    #Display the academic transcript of a student
+    print(student.generate_transcript())
             
 
