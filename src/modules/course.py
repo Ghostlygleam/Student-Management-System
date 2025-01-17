@@ -11,7 +11,6 @@ class Course:
         return len(self.enrolled_students) >= self.capacity
 
     def get_summary(self):
-        #Get a summary of the course including the number of enrolled students
         return f"Course ID: {self.course_id}, Name: {self.name}, Enrolled Students: {len(self.enrolled_students)}/{self.capacity}"
     
     def __str__(self):
