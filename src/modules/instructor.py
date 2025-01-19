@@ -1,7 +1,8 @@
 class Instructor:
-    def __init__(self, instructor_id, name):
+    def __init__(self, instructor_id, name, email):
         self.instructor_id = instructor_id
         self.name = name
+        self.email = email
         
     def assign_grade(self, course, student, grade):
         #Assign grade for specific course
