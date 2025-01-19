@@ -2,9 +2,6 @@
 import pandas as pd
 from src.modules.student import Student
 
-
-
-
 #Creating class StudentProfile
 class StudentProfile:
     def __init__(self):
@@ -49,43 +46,5 @@ class StudentProfile:
         print("Profile not found \n")
 
 
-
 profile = StudentProfile()
 
-#Executing the programm, using while loop
-# while True:
-#     action = input("Student Profile Management: \n"
-#         "=========================== \n"
-#         "Add Profile \n"
-#         "Edit Profile \n"
-#         "Delete Profile \n"
-#         "Exit \n"
-#         "=========================== \n").strip().lower()
-    
-#     if action == "Exit":
-#         break
-#     elif action == "Add profile":
-#         name = input("Enter the student's name: ")
-#         try:
-#             student_id = int(input("Enter student's ID: "))
-#         except ValueError:
-#             print("Wrong id, please enter a number")
-#             continue
-#         email = input("Enter student's email: \n")
-#         profile.add_student(name, student_id, email)
-
-#     elif action == "Edit profile":
-#         old_name = input("enter the name of the profile:")
-#         new_name = input("Enter the new name of the profile")
-#         try:
-#             student_id = int(input("Enter the new ID "))
-#         except ValueError:
-#             print("Wrong id")
-#             continue
-#     elif action == "Delete profile":
-#         name_dl = input("Enter student profile name to delete: \n")
-#         if name_dl in s_profiles_list:
-#             profile.delete_profile(name_dl, student_id, email)
-#             print(f"Student {name_dl} profile deleted \n")
-#         else:
-#             print("Student profile not found \n")
