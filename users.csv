@@ -1,1 +1,9 @@
 id,name,email,password,role
+1,Student Name,vika@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,student
+2,Student Name,dina@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,student
+3,Student Name,mimi@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,student
+4,Student Name,lili@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,student
+5,Student Name,nina@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,student
+1,Instructor Name,ira@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,instructor
+2,Instructor Name,kuru@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,instructor
+0,Admin Name,ali@gmail.com,6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,admin

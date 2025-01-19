@@ -3,9 +3,13 @@ import csv
 
 class Authentication:
     def __init__(self, database_path="users.csv"):
+        """
+        Initializes the authentication system.
+        """
         self.database = database_path
-        self.users = {}  # Память для хранения пользователей
+        self.users = {}
 
+        # Загружаем существующих пользователей из CSV
         try:
             print(f"Loading users from {self.database}...")
             with open(self.database, "r") as file:
@@ -17,35 +21,38 @@ class Authentication:
                     }
             print(f"Loaded users: {self.users}")
         except FileNotFoundError:
-            print(f"Database file '{self.database}' not found. Starting fresh.")
+            print(f"User database '{self.database}' not found. Starting fresh.")
         except Exception as e:
             print(f"Error loading users: {e}")
 
-
-        self.database = database_path  # Устанавливаем путь к базе данных
-
     def register_user(self, email, password, role):
+        """
+        Registers a new user.
+        """
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         if email in self.users:
             print(f"User '{email}' already exists in memory!")
             return
 
-        self.users[email] = {"password": hashed_password, "role": role}  # Сохраняем в память
+        self.users[email] = {"password": hashed_password, "role": role}
 
-        # Запись в CSV
+        # Сохраняем в CSV
         try:
             print(f"Saving user to CSV: email={email}, role={role}")
             with open(self.database, "a", newline="") as file:
                 writer = csv.DictWriter(file, fieldnames=["email", "password", "role"])
                 writer.writerow({"email": email, "password": hashed_password, "role": role})
+                print(f"User '{email}' successfully saved to CSV.")
         except Exception as e:
             print(f"Error writing user to CSV: {e}")
 
-
-
     def login_user(self, email, password):
+        """
+        Logs in a user by verifying their email and password.
+        """
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         user = self.users.get(email)
+
         if not user:
             print(f"User '{email}' not found in memory.")
             return None
@@ -56,4 +63,3 @@ class Authentication:
         else:
             print(f"Invalid password for user '{email}'.")
             return None
-

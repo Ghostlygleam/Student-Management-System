@@ -3,17 +3,9 @@ class Course:
         self.course_id = course_id
         self.name = name
         self.capacity = capacity
-        self.enrolled_students = []  
-        self.instructor = None 
-        
-    def is_full(self):
-        #Check if the course is full
-        return len(self.enrolled_students) >= self.capacity
+        self.enrolled_students = []
+        self.instructor = None
 
-    def get_summary(self):
-        #Get a summary of the course including the number of enrolled students
-        return f"Course ID: {self.course_id}, Name: {self.name}, Enrolled Students: {len(self.enrolled_students)}/{self.capacity}"
-    
     def __str__(self):
-        instructor_name = self.instructor.name if self.instructor else "None"
-        return f"Course ID: {self.course_id}, Name: {self.name}, Capacity: {self.capacity}, Instructor: {instructor_name}"
+        return f"ID: {self.course_id}, Name: {self.name}, Capacity: {self.capacity}, Instructor: {self.instructor or 'None'}"
+

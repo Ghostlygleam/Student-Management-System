@@ -1,34 +1,82 @@
 import csv
 import os
-from src.utils.auth_service import Authentication
-from src.utils.course_service import (
-    add_course,
-    edit_course,
-    delete_course,
-    enroll_student_in_course,
-    unenroll_student_in_course,
-    view_enrolled_students,
-    assign_instructor_to_course,
-    assign_grade_to_student,
-    display_student_gpa,
-    display_transcript,
-    generate_course_list
-)
-from src.modules.course import Course
+import hashlib
 from src.modules.student import Student
 from src.modules.instructor import Instructor
+from src.modules.admin import Admin
+from src.utils.auth_service import Authentication
+from src.modules.course import Course
 
-# Global Variables
-auth = Authentication()
-course_list = []
-instructor_list = []
-student_list = []
+# Путь к файлу с пользователями
 user_file = os.path.join(os.getcwd(), "users.csv")
+
+# Списки пользователей
+student_list = []
+instructor_list = []
+auth = Authentication(user_file)
+
+# Глобальный список курсов
+course_list = []
+course_file = os.path.join(os.getcwd(), "courses.csv")
+
+
+def load_courses():
+    """
+    Загружает курсы из courses.csv в память.
+    """
+    print(f"Loading courses from {course_file}...")
+    try:
+        with open(course_file, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                course = Course(
+                    course_id=int(row["id"]),
+                    name=row["name"].strip(),  # Убираем лишние пробелы
+                    capacity=int(row["capacity"]),
+                )
+                course.instructor = row["instructor_email"].strip() if row["instructor_email"] else None
+                course_list.append(course)
+                print(f"Loaded course: {course}")  # Лог загруженного курса
+        print("Courses successfully loaded.")
+    except FileNotFoundError:
+        print(f"File {course_file} not found. Starting with an empty course list.")
+    except Exception as e:
+        print(f"Error loading courses: {e}")
+    print("Available courses in memory:")
+    for course in course_list:
+        print(course)
+
+
+
+
+
+
+def save_courses():
+    """
+    Сохраняет все курсы в файл courses.csv.
+    """
+    print("Saving courses...")
+    try:
+        with open(course_file, "w", newline="") as file:
+            fieldnames = ["id", "name", "capacity", "instructor_email"]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for course in course_list:
+                writer.writerow({
+                    "id": course.course_id,
+                    "name": course.name,
+                    "capacity": course.capacity,
+                    "instructor_email": course.instructor or ""
+                })
+        print(f"Courses successfully saved to {course_file}.")
+    except Exception as e:
+        print(f"Error saving courses: {e}")
 
 
 def load_users():
     """
-    Load all user profiles from a CSV file and update authentication system.
+    Загружает пользователей из CSV в память.
     """
     print(f"Loading users from {user_file}...")
     try:
@@ -37,30 +85,28 @@ def load_users():
             for row in reader:
                 role = row["role"].lower()
                 email = row["email"]
-                name = row["name"]
-                user_id = int(row["id"])
-
-                # Добавляем пользователя в соответствующий список
+                name = row.get("name", "Unnamed User")
+                user_id = int(row.get("id", 0))
                 if role == "student":
                     student = Student(student_id=user_id, name=name, email=email)
                     student_list.append(student)
                 elif role == "instructor":
                     instructor = Instructor(instructor_id=user_id, name=name, email=email)
                     instructor_list.append(instructor)
-
-                # Добавляем пользователя в систему аутентификации
-                auth.users[email] = {"password": "1", "role": role}  # Здесь можно использовать реальные пароли, если они есть в файле
-
+                # Загружаем данные в систему аутентификации
+                auth.users[email] = {"password": row["password"], "role": role}
         print("Users successfully loaded.")
     except FileNotFoundError:
-        print(f"User file not found at {user_file}. Starting with an empty user list.")
+        print(f"File {user_file} not found. Starting with an empty database.")
     except Exception as e:
         print(f"Error loading users: {e}")
 
 
-
 def save_users():
-    print("Attempting to save users...")
+    """
+    Сохраняет всех пользователей в файл users.csv.
+    """
+    print("Saving users...")
     try:
         with open(user_file, "w", newline="") as file:
             fieldnames = ["id", "name", "email", "password", "role"]
@@ -73,7 +119,7 @@ def save_users():
                     "id": student.student_id,
                     "name": student.name,
                     "email": student.email,
-                    "password": "hashed_password",  # Заменить на реальное значение
+                    "password": auth.users[student.email]["password"],
                     "role": "student"
                 })
 
@@ -83,248 +129,123 @@ def save_users():
                     "id": instructor.instructor_id,
                     "name": instructor.name,
                     "email": instructor.email,
-                    "password": "hashed_password",  # Заменить на реальное значение
+                    "password": auth.users[instructor.email]["password"],
                     "role": "instructor"
                 })
 
+            # Сохранение администраторов
+            for email, data in auth.users.items():
+                if data["role"] == "admin":
+                    writer.writerow({
+                        "id": "0",  # Фиксированный ID для администратора
+                        "name": "Admin Name",
+                        "email": email,
+                        "password": data["password"],
+                        "role": "admin"
+                    })
+
         print(f"Users successfully saved to {user_file}.")
     except Exception as e:
-        print(f"Error saving users to {user_file}: {e}")
+        print(f"Error saving users: {e}")
+        
 
 
 
+def register_user(email, password, role):
+    """
+    Регистрирует нового пользователя в системе.
+    """
+    global student_list, instructor_list
+    if email in auth.users:
+        print(f"User '{email}' already exists!")
+        return
 
+    if role == "student":
+        student_id = len(student_list) + 1
+        student = Student(student_id=student_id, name="Student Name", email=email)
+        student_list.append(student)
+    elif role == "instructor":
+        instructor_id = len(instructor_list) + 1
+        instructor = Instructor(instructor_id=instructor_id, name="Instructor Name", email=email)
+        instructor_list.append(instructor)
+    elif role == "admin":
+        print(f"Registering admin with email {email}.")
+        auth.users[email] = {"password": hashlib.sha256(password.encode()).hexdigest(), "role": "admin"}
+    else:
+        print("Invalid role specified. Please choose 'student', 'instructor', or 'admin'.")
+        return
 
+    auth.register_user(email, password, role)
+    save_users()
 
 def admin_menu():
     """
-    Admin menu for managing courses, instructors, and profiles.
+    Меню для администратора.
     """
     while True:
         print("\nAdmin Menu:")
         print("===========================")
-        print("1. Add Course")
-        print("2. Edit Course")
-        print("3. Delete Course")
-        print("4. Manage User Profiles")
-        print("5. Manage Instructors")
-        print("6. View Course Statistics")
-        print("7. Logout")
+        print("1. View All Users")
+        print("2. Add New User")
+        print("3. View All Courses")
+        print("4. Add New Course")
+        print("5. Assign Instructor to Course")
+        print("6. Logout")
         print("===========================")
         action = input("Choose an option: ")
 
         if action == "1":
-            course_id = int(input("Enter course ID: "))
+            print("\nRegistered Users:")
+            for email, data in auth.users.items():
+                print(f"Email: {email}, Role: {data['role']}")
+        elif action == "2":
+            email = input("Enter new user's email: ")
+            password = input("Enter new user's password: ")
+            role = input("Enter new user's role (admin/student/instructor): ").lower()
+            register_user(email, password, role)
+        elif action == "3":
+            print("\nAll Courses:")
+            for course in course_list:
+                print(f"ID: {course.course_id}, Name: {course.name}, Capacity: {course.capacity}, Instructor: {course.instructor or 'None'}")
+        elif action == "4":
+            course_id = len(course_list) + 1
             name = input("Enter course name: ")
             capacity = int(input("Enter course capacity: "))
-            add_course(course_list, course_id, name, capacity)
-
-        elif action == "2":
-            course_id = int(input("Enter course ID to edit: "))
-            new_name = input("Enter new course name (leave empty to skip): ") or None
-            try:
-                new_capacity = int(input("Enter new course capacity (leave empty to skip): ") or 0)
-            except ValueError:
-                new_capacity = None
-            edit_course(course_list, course_id, new_name, new_capacity)
-
-        elif action == "3":
-            course_id = int(input("Enter course ID to delete: "))
-            delete_course(course_list, course_id)
-
-        elif action == "4":
-            manage_profiles()
-
+            course = Course(course_id=course_id, name=name, capacity=capacity)
+            course_list.append(course)
+            save_courses()
+            print(f"Course '{name}' added successfully.")
         elif action == "5":
-            manage_instructors()
+            try:
+                course_id = int(input("Enter course ID: "))
+                instructor_email = input("Enter instructor's email: ")
+                course = next((c for c in course_list if c.course_id == course_id), None)
+                instructor = next((i for i in instructor_list if i.email == instructor_email), None)
+
+                if not course:
+                    print(f"Course with ID {course_id} does not exist.")
+                elif not instructor:
+                    print(f"Instructor with email {instructor_email} does not exist.")
+                else:
+                    course.instructor = instructor_email
+                    save_courses()
+                    print(f"Instructor '{instructor_email}' assigned to course '{course.name}'.")
+            except ValueError:
+                print("Invalid input. Course ID must be a number.")
 
         elif action == "6":
-            generate_course_list(course_list)
-
-        elif action == "7":
-            print("Logging out...")
+            print("Logging out of Admin Panel...")
             break
-
         else:
             print("Invalid option. Please choose again.")
 
 
-def manage_profiles():
+def student_menu(student_email):
     """
-    Menu for managing student profiles.
+    Меню для студента.
     """
-    global student_list
-    while True:
-        print("\nManage Profiles:")
-        print("===========================")
-        print("1. Add Profile")
-        print("2. Edit Profile")
-        print("3. Delete Profile")
-        print("4. View All Profiles")
-        print("5. Back to Admin Menu")
-        print("===========================")
-        action = input("Choose an option: ")
-
-        if action == "1":
-            name = input("Enter the student's name: ")
-            student_id = int(input("Enter the student's ID: "))
-            email = input("Enter the student's email: ")
-            password = input("Set a password for this student: ")
-
-            if email and password:
-                # Register user in the authentication system
-                auth.register_user(email, password, "student")
-                
-                # Add student to the student list
-                student_list.append(Student(name=name, student_id=student_id, email=email))
-                print("Saving users to file...")
-                save_users()
-                print("Save completed.")
-                print(f"Student profile for {name} added successfully and is ready for login.")
-            else:
-                print("Email and password are required to create a profile.")
-
-        elif action == "2":
-            email = input("Enter the email of the profile to edit: ")
-            student = next((s for s in student_list if s.email == email), None)
-            if student:
-                new_name = input("Enter new name (leave empty to skip): ") or student.name
-                student.name = new_name
-                print("Saving users to file...")
-                save_users()
-                print("Save completed.")
-                print(f"Profile for {email} updated successfully.")
-            else:
-                print("Profile not found.")
-
-        elif action == "3":
-            email = input("Enter the email of the profile to delete: ")
-            student_list = [s for s in student_list if s.email != email]
-            print("Saving users to file...")
-            save_users()
-            print("Save completed.")
-            print(f"Profile with email {email} has been deleted.")
-
-        elif action == "4":
-            print("\nAll Profiles:")
-            for student in student_list:
-                print(f"ID: {student.student_id}, Name: {student.name}, Email: {student.email}")
-
-        elif action == "5":
-            print("Returning to Admin Menu...")
-            break
-
-        else:
-            print("Invalid option. Please choose again.")
-
-
-
-
-def manage_instructors():
-    """
-    Menu for managing instructors.
-    """
-    while True:
-        print("\nManage Instructors:")
-        print("===========================")
-        print("1. Add Instructor")
-        print("2. Assign Instructor to Course")
-        print("3. View All Instructors")
-        print("4. Back to Admin Menu")
-        print("===========================")
-        action = input("Choose an option: ")
-
-        if action == "1":
-            instructor_id = int(input("Enter instructor ID: "))
-            name = input("Enter instructor name: ")
-            email = input("Enter instructor email: ")
-            password = input("Set a password for this instructor: ")
-
-            if email and password:
-                auth.register_user(email, password, "instructor")
-                instructor_list.append(Instructor(instructor_id=instructor_id, name=name, email=email))
-                print("Saving users to file...")
-                save_users()
-                print("Save completed.")
-                print(f"Instructor '{name}' added successfully and is ready for login.")
-            else:
-                print("Email and password are required to create an instructor profile.")
-
-        elif action == "2":
-            instructor_id = int(input("Enter instructor ID: "))
-            course_id = int(input("Enter course ID: "))
-            instructor = next((i for i in instructor_list if i.instructor_id == instructor_id), None)
-            course = next((c for c in course_list if c.course_id == course_id), None)
-
-            if instructor and course:
-                assign_instructor_to_course(course, instructor)
-            else:
-                print("Invalid instructor or course ID.")
-
-        elif action == "3":
-            print("\nList of Instructors:")
-            for instructor in instructor_list:
-                print(f"Instructor ID: {instructor.instructor_id}, Name: {instructor.name}, Email: {instructor.email}")
-
-        elif action == "4":
-            print("Returning to Admin Menu...")
-            break
-
-        else:
-            print("Invalid option. Please choose again.")
-
-
-def instructor_menu(email):
-    """
-    Instructor menu for managing courses and grades.
-    """
-    current_instructor = next((i for i in instructor_list if i.email == email), None)
-    if not current_instructor:
-        print("Instructor profile not found.")
-        return
-
-    while True:
-        print("\nInstructor Menu:")
-        print("===========================")
-        print("1. Assign Grade to Student")
-        print("2. View Enrolled Students in a Course")
-        print("3. Logout")
-        print("===========================")
-        action = input("Choose an option: ")
-
-        if action == "1":
-            course_id = int(input("Enter course ID: "))
-            student_id = int(input("Enter student ID: "))
-            grade = input("Enter grade (A-F): ")
-            course = next((c for c in course_list if c.course_id == course_id), None)
-            student = next((s for s in student_list if s.student_id == student_id), None)
-
-            if course and student:
-                assign_grade_to_student(student, course_id, grade)
-            else:
-                print("Invalid course ID or student ID.")
-
-        elif action == "2":
-            course_id = int(input("Enter course ID: "))
-            course = next((c for c in course_list if c.course_id == course_id), None)
-            if course:
-                view_enrolled_students(course, student_list)
-            else:
-                print("Invalid course ID.")
-
-        elif action == "3":
-            print("Logging out...")
-            break
-
-        else:
-            print("Invalid option. Please choose again.")
-
-
-def student_menu(email):
-    """
-    Student menu for viewing and managing personal information.
-    """
-    current_student = next((s for s in student_list if s.email == email), None)
+    # Ищем текущего студента в списке студентов по email
+    current_student = next((s for s in student_list if s.email == student_email), None)
     if not current_student:
         print("Student profile not found.")
         return
@@ -332,34 +253,119 @@ def student_menu(email):
     while True:
         print("\nStudent Menu:")
         print("===========================")
-        print("1. Enroll in a Course")
-        print("2. View Grades and Transcript")
-        print("3. Logout")
+        print("1. View Enrolled Courses")
+        print("2. Enroll in a Course")
+        print("3. View Grades and GPA")
+        print("4. Logout")
         print("===========================")
         action = input("Choose an option: ")
 
         if action == "1":
-            course_id = int(input("Enter course ID to enroll in: "))
-            course = next((c for c in course_list if c.course_id == course_id), None)
-            if course:
-                enroll_student_in_course(course, current_student)
+            # Просмотр записанных курсов
+            print("\nEnrolled Courses:")
+            if current_student.enrolled_courses:
+                for course in current_student.enrolled_courses:
+                    print(f"- {course}")
             else:
-                print("Invalid course ID.")
+                print("You are not enrolled in any courses.")
 
         elif action == "2":
-            display_transcript(current_student)
+            try:
+                course_name = input("Enter the name of the course to enroll in: ").strip().lower()
+                course = next((c for c in course_list if c.name.lower() == course_name), None)
+
+                if not course:
+                    print(f"Course '{course_name}' does not exist.")
+                elif len(course.enrolled_students) >= course.capacity:
+                    print(f"Course '{course.name}' is full. Cannot enroll.")
+                else:
+                    current_student.enroll_in_course(course.name)
+                    course.enrolled_students.append(current_student)
+                    print(f"You have been enrolled in '{course.name}'.")
+                    save_courses()
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
+
 
         elif action == "3":
-            print("Logging out...")
+            # Просмотр оценок и расчёт GPA
+            print("\nYour Grades:")
+            for course_id, grade in current_student.grades.items():
+                print(f"Course: {course_id}, Grade: {grade}")
+            gpa = current_student.calculate_gpa()
+            print(f"Your GPA: {gpa:.2f}")
+
+        elif action == "4":
+            print("Logging out of Student Dashboard...")
             break
 
         else:
             print("Invalid option. Please choose again.")
 
 
+def instructor_menu(instructor_email):
+    """
+    Меню для преподавателя.
+    """
+    # Определяем текущего инструктора по email
+    current_instructor = next((i for i in instructor_list if i.email == instructor_email), None)
+    if not current_instructor:
+        print("Instructor profile not found.")
+        return
+
+    while True:
+        print("\nInstructor Menu:")
+        print("===========================")
+        print("1. View Assigned Courses")
+        print("2. Assign Grade to Student")
+        print("3. Logout")
+        print("===========================")
+        action = input("Choose an option: ")
+
+        if action == "1":
+            print("\nAssigned Courses:")
+            assigned_courses = [course for course in course_list if course.instructor and course.instructor.lower() == instructor_email.lower()]
+            if assigned_courses:
+                for course in assigned_courses:
+                    print(f"Course ID: {course.course_id}, Name: {course.name}, Capacity: {course.capacity}")
+            else:
+                print("No courses assigned yet.")
+        elif action == "2":
+            try:
+                student_email = input("Enter the email of the student: ")
+                course_id = int(input("Enter the course ID: "))
+                grade = input("Enter the grade (A-F): ").upper()
+
+                student = next((s for s in student_list if s.email == student_email), None)
+                course = next((c for c in course_list if c.course_id == course_id), None)
+
+                if not student:
+                    print("Student not found.")
+                elif not course:
+                    print("Course not found.")
+                elif course.instructor and course.instructor.lower() != instructor_email.lower():
+                    print("You are not assigned to this course.")
+                else:
+                    # Используем текущего инструктора для назначения оценки
+                    current_instructor.assign_grade(student, course_id, grade)
+                    print(f"Grade '{grade}' assigned to student '{student.name}' for course '{course.name}'.")
+            except ValueError:
+                print("Invalid input. Course ID must be a number.")
+        elif action == "3":
+            print("Logging out of Instructor Dashboard...")
+            break
+        else:
+            print("Invalid option. Please choose again.")
+
+
+
+
+
+
 def authentication_menu():
     """
-    Menu for user authentication and role-based access.
+    Меню аутентификации.
     """
     while True:
         print("\nAuthentication Menu:")
@@ -370,19 +376,18 @@ def authentication_menu():
         print("===========================")
         action = input("Choose an option: ")
 
-        if action == "1":  # Регистрация нового пользователя
+        if action == "1":
             username = input("Enter your username: ")
             email = input("Enter your email: ")
             password = input("Enter your password: ")
             role = input("Enter your role (admin/student/instructor): ").lower()
 
             if email and password:
-                # Вызываем функцию register_user для регистрации
                 register_user(email, password, role)
             else:
                 print("Email and password are required for registration.")
 
-        elif action == "2":  # Вход в систему
+        elif action == "2":
             email = input("Enter your email: ")
             password = input("Enter your password: ")
             role = auth.login_user(email, password)
@@ -396,45 +401,16 @@ def authentication_menu():
             else:
                 print("Invalid role or authentication failed.")
 
-        elif action == "3":  # Выход из системы
+        elif action == "3":
             print("Exiting the program. Goodbye!")
             break
 
         else:
             print("Invalid option. Please choose again.")
 
-            
-def register_user(email, password, role):
-    global student_list, instructor_list
-    if email in auth.users:
-        print(f"User '{email}' already exists!")
-        return
-
-    # Генерация ID
-    if role == "student":
-        student_id = len(student_list) + 1
-        student = Student(student_id=student_id, name="Student Name", email=email)
-        student_list.append(student)
-    elif role == "instructor":
-        instructor_id = len(instructor_list) + 1
-        instructor = Instructor(instructor_id=instructor_id, name="Instructor Name", email=email)
-        instructor_list.append(instructor)
-    elif role == "admin":
-        print(f"Registering admin with email {email}.")
-        auth.users[email] = {"password": password, "role": "admin"}  # Добавляем администратора в память
-    else:
-        print("Invalid role specified. Please choose 'student', 'instructor', or 'admin'.")
-        return
-
-    # Добавляем пользователя в CSV через auth.register_user
-    print(f"Attempting to register user: email={email}, password={password}, role={role}")
-    auth.register_user(email, password, role)  # Сохраняем в CSV через Authentication
-    save_users()  # Обновляем основной users.csv
-    print(f"User '{email}' registered successfully!")
-
-
-
 
 
 if __name__ == "__main__":
+    load_users()
+    load_courses()
     authentication_menu()
