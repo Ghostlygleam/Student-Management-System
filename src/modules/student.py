@@ -3,26 +3,18 @@ class Student:
         self.student_id = student_id
         self.name = name
         self.email = email
-        self.enrolled_courses = []  
+        self.enrolled_courses = []
         self.grades = {}
 
-    def add_course(self, course_name):
-        #Add a course to the student's enrolled courses list
-        self.enrolled_courses.append(course_name)
-        
     def enroll_in_course(self, course):
-        #Enroll the student in a course
-        self.enrolled_courses.append(course.course_id)
-    
+        self.enrolled_courses.append(course)
+
     def assign_grade(self, course_id, grade):
-        #Assign grade for students
         self.grades[course_id] = grade
-        print(f"Grade '{grade}' has been assigned to student '{self.name}' for course ID '{course_id}'.")
-    
+
     def calculate_gpa(self):
-        #Calculate the GPA based on the student's grades
         if not self.grades:
-            return 0.0  
+            return 0.0
 
         grade_points = {
             'A': 4.0,
@@ -32,31 +24,8 @@ class Student:
             'F': 0.0
         }
 
-        total_points = 0
-        total_courses = len(self.grades)
+        total_points = sum(grade_points.get(grade, 0) for grade in self.grades.values())
+        return total_points / len(self.grades)
 
-        for course_id, grade in self.grades.items():
-            total_points += grade_points.get(grade, 0.0) 
-
-        return total_points / total_courses
-        
-    def generate_transcript(self):
-        #Generate an academic transcript for the student
-        transcript = f"Academic Transcript for {self.name} (Student ID: {self.student_id}):\n"
-        transcript += f"{'Course ID':<10}{'Grade':<10}\n"
-        transcript += "-" * 20 + "\n"
-
-        if not self.grades:
-            transcript += "No grades available.\n"
-        else:
-            for course_id, grade in self.grades.items():
-                transcript += f"{course_id:<10}{grade:<10}\n"
-
-        gpa = self.calculate_gpa()
-        transcript += f"\nGPA: {gpa:.2f}\n"
-
-        return transcript
-        
-
-        
-    
+    def __str__(self):
+        return f"Student ID: {self.student_id}, Name: {self.name}, Email: {self.email}"
