@@ -248,7 +248,7 @@ def admin_menu():
                 course_id = len(course_list) + 1
                 course = Course(course_id=course_id, name=name, capacity=capacity)
                 course_list.append(course)
-                save_courses()
+                save_courses(course_list, course_file)
                 print(f"Course '{name}' added successfully.")
             except ValueError:
                 print("Invalid input for course capacity. Please enter a number.")
@@ -266,7 +266,7 @@ def admin_menu():
                     print(f"Instructor with email {instructor_email} does not exist.")
                 else:
                     course.instructor = instructor_email
-                    save_courses()
+                    save_courses(course_list, course_file)
                     print(f"Instructor '{instructor_email}' assigned to course '{course.name}'.")
             except ValueError:
                 print("Invalid input. Course ID must be a number.")
@@ -319,7 +319,7 @@ def student_menu(student_email):
                 current_student.enroll_in_course(course.name)
                 course.enrolled_students.append(current_student)
                 print(f"You have successfully enrolled in '{course.name}'.")
-                save_courses()
+                save_courses(course_list, course_file)
 
         elif action == "3":
             print("\nYour Grades:")
