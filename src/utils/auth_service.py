@@ -25,6 +25,8 @@ class Authentication:
             print(f"Unexpected error while loading users: {e}")
 
     def register_user(self, email, password, role):
+        if email in self.users:
+            raise ValueError(f"User with email {email} already exists.")
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         if email in self.users:

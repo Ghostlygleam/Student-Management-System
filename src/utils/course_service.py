@@ -32,11 +32,12 @@ def delete_course(course_list, course_id):
     # Remove a course from the list by ID
     for course in course_list:
         if course.course_id == course_id:
+            if course.enrolled_students:
+                raise Exception(f"Can't delete course with ID {course_id} because it has enrolled students")
             course_list.remove(course)
             print(f"Course with ID {course_id} has been deleted successfully!")
             return
-    # Inform the user if the course was not found
-    print(f"Course with ID {course_id} not found.")
+    raise ValueError(f"Course with ID {course_id} does not exist.")
     
 def assign_instructor_to_course(course, instructor):
     # Check if the course already has an assigned instructor

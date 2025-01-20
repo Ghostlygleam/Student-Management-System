@@ -53,35 +53,23 @@ def load_courses():
         print(f"- {course.name} (ID: {course.course_id}, Capacity: {course.capacity})")
 
 def save_courses(courses, file_path):
-    if not courses:
-        print("Nothing to save. No courses provided.")
-        return
-
-    print("Saving courses to file...")
+    if not file_path:
+        raise ValueError("The file path for saving courses cannot be empty.")
     try:
-        # Ensure directory exists
-        directory = os.path.dirname(file_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
         with open(file_path, "w", newline="") as file:
             writer = csv.DictWriter(file, fieldnames=["id", "name", "capacity", "instructor_email"])
-            writer.writeheader()
-
-            for c in courses:  
+            writer.writeheader()  
+            for course in courses:
                 writer.writerow({
-                    "id": c.course_id,
-                    "name": c.name,
-                    "capacity": c.capacity,
-                    "instructor_email": c.instructor or ""
+                    "id": course.course_id,
+                    "name": course.name,
+                    "capacity": course.capacity,
+                    "instructor_email": course.instructor or ""
                 })
+        print("Courses saved successfully.")
+    except Exception as e:
+        print(f"Failed to save courses: {e}")
 
-        print("Courses saved.")
-
-    except PermissionError:
-        print("Cannot save courses. Permission denied.")
-    except Exception as ex:  
-        print(f"Failed to save courses: {ex}")
 
 def load_users():
     print(f"Loading users from file: {user_file}")
