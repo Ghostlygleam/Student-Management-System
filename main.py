@@ -293,7 +293,7 @@ def student_menu(student_email):
             else:
                 print("You are not enrolled in any courses yet.")
 
-        elif action == "2":
+        elif action == "2":  # Enroll in a Course
             course_name = input("Enter the name of the course to enroll in: ").strip()
             course = next((c for c in course_list if c.name.lower() == course_name.lower()), None)
 
@@ -301,23 +301,26 @@ def student_menu(student_email):
                 print(f"Course '{course_name}' does not exist. Please check the course name.")
             elif len(course.enrolled_students) >= course.capacity:
                 print(f"Course '{course.name}' is full. Enrollment is not possible.")
-            elif course.name in current_student.enrolled_courses:
+            elif course.course_id in current_student.enrolled_courses:
                 print(f"You are already enrolled in '{course.name}'.")
             else:
-                current_student.enroll_in_course(course.name)
-                course.enrolled_students.append(current_student)
+                current_student.enroll_in_course(course)  
+                course.enrolled_students.append(current_student.student_id)  
                 print(f"You have successfully enrolled in '{course.name}'.")
-                save_courses(course_list, course_file)
+
 
         elif action == "3":
             print("\nYour Grades:")
             if current_student.grades:
-                for course_id, grade in current_student.grades.items():
-                    print(f"Course: {course_id}, Grade: {grade}")
+                for course_id, grades in current_student.grades.items():
+                    grades_str = ", ".join(grades)
+                    print(f"Course: {course_id}, Grades: {grades_str}")
             else:
                 print("No grades available yet.")
             gpa = current_student.calculate_gpa()
             print(f"Your GPA: {gpa:.2f}")
+
+
 
         elif action == "4":
             print("Logging out of the Student Dashboard...")
@@ -354,7 +357,7 @@ def instructor_menu(instructor_email):
             else:
                 print("You have not been assigned to any courses yet.")
 
-        elif action == "2":
+        elif action == "2":  
             student_email = input("Enter the email of the student: ").strip()
             try:
                 course_id = int(input("Enter the course ID: ").strip())
@@ -367,15 +370,15 @@ def instructor_menu(instructor_email):
                     print(f"Student with email '{student_email}' not found.")
                 elif not course:
                     print(f"Course with ID '{course_id}' not found.")
-                elif course.instructor and course.instructor.lower() != instructor_email.lower():
-                    print(f"You are not assigned to the course '{course.name}'.")
+                elif course_id not in student.enrolled_courses:
+                    print(f"Student '{student.name}' is not enrolled in course '{course.name}'.")
                 elif grade not in ["A", "B", "C", "D", "F"]:
                     print("Invalid grade. Please enter a grade from A to F.")
                 else:
-                    current_instructor.assign_grade(student, course_id, grade)
-                    print(f"Grade '{grade}' assigned to student '{student.name}' for course '{course.name}'.")
+                    student.assign_grade(course_id, grade)
             except ValueError:
                 print("Invalid input. Course ID must be a valid number.")
+
 
         elif action == "3":
             print("Logging out of Instructor Dashboard...")
