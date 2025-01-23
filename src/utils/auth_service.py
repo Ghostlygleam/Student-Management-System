@@ -26,12 +26,9 @@ class Authentication:
 
     def register_user(self, email, password, role):
         if email in self.users:
-            raise ValueError(f"User with email {email} already exists.")
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
-        if email in self.users:
             print(f"Cannot register '{email}': User already exists.")
             return
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         self.users[email] = {"password": hashed_password, "role": role}
 

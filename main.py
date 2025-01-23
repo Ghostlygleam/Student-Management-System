@@ -79,7 +79,6 @@ def load_users():
             for row in reader:
                 role = row.get("role", "").strip().lower()
                 email = row.get("email", "").strip()
-                name = row.get("name", "Unnamed User").strip()
                 user_id = row.get("id", 0)
 
                 if not role or not email or not user_id:
@@ -93,10 +92,10 @@ def load_users():
                     continue
 
                 if role == "student":
-                    student = Student(student_id=user_id, name=name, email=email)
+                    student = Student(student_id=user_id, email=email)
                     student_list.append(student)
                 elif role == "instructor":
-                    instructor = Instructor(instructor_id=user_id, name=name, email=email)
+                    instructor = Instructor(instructor_id=user_id, email=email)
                     instructor_list.append(instructor)
                 else:
                     print(f"Unknown role '{role}' for user: {row}")
@@ -116,7 +115,7 @@ def save_users():
     print("Starting user save process...")
     try:
         with open(user_file, mode="w", newline="") as file:
-            fieldnames = ["id", "name", "email", "password", "role"]
+            fieldnames = ["id", "email", "password", "role"]
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -124,7 +123,6 @@ def save_users():
             for student in student_list:
                 writer.writerow({
                     "id": student.student_id,
-                    "name": student.name,
                     "email": student.email,
                     "password": auth.users.get(student.email, {}).get("password", ""),
                     "role": "student"
@@ -134,7 +132,6 @@ def save_users():
             for instructor in instructor_list:
                 writer.writerow({
                     "id": instructor.instructor_id,
-                    "name": instructor.name,
                     "email": instructor.email,
                     "password": auth.users.get(instructor.email, {}).get("password", ""),
                     "role": "instructor"
@@ -145,7 +142,6 @@ def save_users():
                 if data.get("role") == "admin":
                     writer.writerow({
                         "id": "0",  # Fixed ID for admin
-                        "name": "Admin",
                         "email": email,
                         "password": data.get("password", ""),
                         "role": "admin"
@@ -167,12 +163,12 @@ def register_user(email, password, role):
 
     if role == "student":
         student_id = len(student_list) + 1
-        student = Student(student_id=student_id, name="Unnamed Student", email=email)
+        student = Student(student_id=student_id, email=email)
         student_list.append(student)
         print(f"New student registered with email: {email}, ID: {student_id}.")
     elif role == "instructor":
         instructor_id = len(instructor_list) + 1
-        instructor = Instructor(instructor_id=instructor_id, name="Unnamed Instructor", email=email)
+        instructor = Instructor(instructor_id=instructor_id, email=email)
         instructor_list.append(instructor)
         print(f"New instructor registered with email: {email}, ID: {instructor_id}.")
     elif role == "admin":
@@ -371,7 +367,7 @@ def instructor_menu(instructor_email):
                 elif not course:
                     print(f"Course with ID '{course_id}' not found.")
                 elif course_id not in student.enrolled_courses:
-                    print(f"Student '{student.name}' is not enrolled in course '{course.name}'.")
+                    print(f"Student '{student.email}' is not enrolled in course '{course.name}'.")
                 elif grade not in ["A", "B", "C", "D", "F"]:
                     print("Invalid grade. Please enter a grade from A to F.")
                 else:

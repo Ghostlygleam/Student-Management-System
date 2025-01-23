@@ -1,14 +1,13 @@
 class Student:
-    def __init__(self, student_id, name, email):
+    def __init__(self, student_id, email):
         self.student_id = student_id
-        self.name = name
         self.email = email
         self.enrolled_courses = []
         self.grades = {}
 
     def enroll_in_course(self, course):
         self.enrolled_courses.append(course.course_id)
-        print(f"Student '{self.name}' enrolled in course '{course.name}'.")
+        print(f"Student '{self.email}' enrolled in course '{course.name}'.")
 
 
 
@@ -19,7 +18,7 @@ class Student:
         if course_id not in self.grades:
             self.grades[course_id] = []
         self.grades[course_id].append(grade)
-        print(f"Grade '{grade}' assigned to student '{self.name}' for course ID '{course_id}'.")
+        print(f"Grade '{grade}' assigned to student '{self.email}' for course ID '{course_id}'.")
 
     def calculate_gpa(self):
         if not self.grades:
@@ -49,4 +48,4 @@ class Student:
 
 
     def __str__(self):
-        return f"Student ID: {self.student_id}, Name: {self.name}, Email: {self.email}"
+        return f"Student ID: {self.student_id}, Email: {self.email}"
