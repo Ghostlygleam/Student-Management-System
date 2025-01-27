@@ -143,7 +143,6 @@ def save_users():
                 if data.get("role") == "admin":
                     writer.writerow({
                         "id": "0",  # Fixed ID for admin
-                        "name": "Admin",
                         "email": email,
                         "password": data.get("password", ""),
                         "role": "admin"
