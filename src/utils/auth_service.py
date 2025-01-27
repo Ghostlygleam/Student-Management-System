@@ -26,20 +26,17 @@ class Authentication:
 
     def register_user(self, email, password, role):
         if email in self.users:
-            raise ValueError(f"User with email {email} already exists.")
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
-        if email in self.users:
-            print(f"Cannot register '{email}': User already exists.")
+            print(f"User with email '{email}' already exists. Registration aborted.")
             return
 
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
         self.users[email] = {"password": hashed_password, "role": role}
 
         try:
             print(f"Adding new user: {email} as '{role}'")
             with open(self.database, "a", newline="") as file:
                 writer = csv.DictWriter(file, fieldnames=["email", "password", "role"])
-                if file.tell() == 0:  # Write header if file is empty
+                if file.tell() == 0:
                     writer.writeheader()
                 writer.writerow({"email": email, "password": hashed_password, "role": role})
             print(f"User '{email}' registered successfully and saved to the database.")
@@ -49,6 +46,7 @@ class Authentication:
             print(f"Error: Insufficient permissions to write to '{self.database}'.")
         except Exception as e:
             print(f"Unexpected error while saving user '{email}': {e}")
+
 
     def login_user(self, email, password):
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
